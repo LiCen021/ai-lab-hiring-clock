@@ -16,7 +16,7 @@ max_retries: 5
 user_agent: "ai-lab-hiring-clock/0.1 (portfolio research; polite 1 req/s)"
 
 # Job detail pages: which captures per job ID to download (CDX lists all of them anyway).
-job_page_captures: [earliest, latest]
+job_page_captures: [earliest]
 
 suspect_threshold: 0.5
 boilerplate_threshold: 0.5
