@@ -10,3 +10,6 @@ __pycache__/
 .DS_Store
 .env
 *.duckdb
+
+# Claude Code worktrees (local checkouts, never committed)
+.claude/worktrees/
