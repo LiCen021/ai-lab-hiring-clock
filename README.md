@@ -6,7 +6,7 @@ This project tracks how Anthropic's hiring mix changes over time, using archived
 
 > The clock is here to catch your eye, not to prove anything. One company's hiring mix mostly tracks its growth stage, funding and strategy. If the engineering share drops, that alone doesn't mean robots took the keyboards.
 
-**Dashboard:** `https://<username>.github.io/ai-lab-hiring-clock/` (GitHub Pages; the clock, then tabs for hiring mix, engineering, salary and a job explorer)
+**Dashboard:** `https://LiCen021.github.io/ai-lab-hiring-clock/` (GitHub Pages; the clock, then tabs for hiring mix, engineering, salary and a job explorer)
 
 ## Status: prototype
 
