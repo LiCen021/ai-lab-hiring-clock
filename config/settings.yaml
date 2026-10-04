@@ -1,0 +1,37 @@
+company: anthropic
+
+# Wayback discovery. Each host is listed once with matchType=prefix; URLs are then
+# classified (board page / paginated board page / job detail page / API) by src/fetch_wayback.py.
+sources:
+  - name: job_boards          # current HTML board (Remix app, paginated 50/page)
+    host: job-boards.greenhouse.io/anthropic
+  - name: boards              # older HTML board (single page, div.opening rows)
+    host: boards.greenhouse.io/anthropic
+  - name: api                 # JSON API, incl. ?content=true
+    host: boards-api.greenhouse.io/v1/boards/anthropic/jobs
+
+backfill_from: 2025-01-01
+request_interval_seconds: 1.0
+max_retries: 5
+user_agent: "ai-lab-hiring-clock/0.1 (portfolio research; polite 1 req/s)"
+
+# Job detail pages: which captures per job ID to download (CDX lists all of them anyway).
+job_page_captures: [earliest, latest]
+
+suspect_threshold: 0.5
+boilerplate_threshold: 0.5
+gap_days: 14
+
+llm:
+  provider: openrouter
+  model: null            # pin an exact ID at build step 4; never an auto-updating alias
+  temperature: 0
+  prompt_version: v1
+
+low_coverage_periods:
+  - [2025-12-01, 2026-01-31]
+
+benchmark:
+  hirebase_2025: 893
+  hirebase_2026: 1193
+  as_of: 2026-10-04

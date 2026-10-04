@@ -1,0 +1,12 @@
+# Raw data never enters the public repo (REQUIREMENTS §5)
+data/raw/
+raw-store/
+
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ipynb_checkpoints/
+.DS_Store
+.env
+*.duckdb

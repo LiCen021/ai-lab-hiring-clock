@@ -1,0 +1,13 @@
+# Fixed tag vocabulary. The LLM schema is generated from this file (all enums/bools);
+# the model may not invent values. Changing this file requires bumping llm.prompt_version.
+ai_skills: [agents, evals, mcp, claude_code, rlhf, fine_tuning, prompting, llm]
+tech_skills: [python, rust, typescript, javascript, go, java, cpp, sql, kubernetes, aws, gcp,
+              terraform, gpu_cuda, jax, pytorch, distributed_systems, spark, react]
+degree: [phd, masters, bachelors, none_stated]
+work_arrangement: [remote, hybrid, in_office]
+focus_area: [pretraining, alignment, interpretability, product, infra, security, data,
+             gtm, policy, ops, other]
+
+regex:
+  salary_range: '(?P<cur>[$£€])\s?(?P<min>[\d,]{2,})(?:\s*(?:USD|GBP|EUR))?\s*[-–—]\s*[$£€]?\s?(?P<max>[\d,]{2,})'
+  years_experience: '(\d+)\+?\s*(?:years|yrs)'
