@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Job Post Explorer</title>
+<style>
+:root {
+  color-scheme: light;
+  --page: #f9f9f7; --surface-1: #fcfcfb; --surface-2: #f3f2ee;
+  --text-primary: #0b0b0b; --text-secondary: #52514e; --muted: #898781;
+  --grid: #e1e0d9; --axis: #c3c2b7; --border: rgba(11,11,11,0.10); --link: #256abf;
+  --s1: #2a78d6; --s2: #eb6834; --s3: #1baf7a; --s4: #eda100;
+  --s5: #e87ba4; --s6: #008300; --s7: #4a3aa7; --s-other: #a8a7a0;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --page: #0d0d0d; --surface-1: #1a1a19; --surface-2: #232322;
+    --text-primary: #ffffff; --text-secondary: #c3c2b7; --muted: #898781;
+    --grid: #2c2c2a; --axis: #383835; --border: rgba(255,255,255,0.10); --link: #86b6ef;
+    --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500;
+    --s5: #d55181; --s6: #008300; --s7: #9085e9; --s-other: #6b6a64;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --page: #0d0d0d; --surface-1: #1a1a19; --surface-2: #232322;
+  --text-primary: #ffffff; --text-secondary: #c3c2b7; --muted: #898781;
+  --grid: #2c2c2a; --axis: #383835; --border: rgba(255,255,255,0.10); --link: #86b6ef;
+  --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500;
+  --s5: #d55181; --s6: #008300; --s7: #9085e9; --s-other: #6b6a64;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--page); color: var(--text-primary);
+       font: 15px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
+main { max-width: 1180px; margin: 0 auto; padding: 24px 16px 64px; }
+a { color: var(--link); }
+nav { display: flex; gap: 16px; font-size: 14px; margin-bottom: 12px; }
+nav a { text-decoration: none; color: var(--text-secondary); }
+nav a[aria-current="page"] { color: var(--text-primary); font-weight: 600; }
+header h1 { font-size: 26px; margin: 0 0 4px; letter-spacing: -0.01em; }
+header p { margin: 0; color: var(--text-secondary); max-width: 780px; }
+h2 { font-size: 17px; margin: 28px 0 10px; }
+.sw { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 6px; vertical-align: baseline; flex: none; }
+.cats { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+.cat { background: var(--surface-1); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; min-width: 0; display: flex; flex-direction: column; }
+.cat-head { display: flex; align-items: center; font-weight: 600; }
+.cat-n { margin-left: auto; font-weight: 600; font-variant-numeric: tabular-nums; }
+.cat-share { font-size: 12px; color: var(--muted); margin: 2px 0 8px; }
+.bar { height: 4px; border-radius: 2px; background: var(--grid); margin-bottom: 10px; overflow: hidden; }
+.bar > span { display: block; height: 100%; border-radius: 2px; }
+.cat ol { margin: 0 0 10px; padding: 0; list-style: none; font-size: 13px; flex: 1; }
+.cat li { display: flex; gap: 8px; padding: 2px 0; border-bottom: 1px solid var(--grid); }
+.cat li span:first-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; }
+.cat li span:last-child { color: var(--muted); font-variant-numeric: tabular-nums; }
+.cat button { align-self: flex-start; }
+.filters { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; position: sticky; top: 0; z-index: 5;
+           background: var(--page); padding: 10px 0; border-bottom: 1px solid var(--grid); }
+.filters label { font-size: 13px; color: var(--text-secondary); }
+input, select, button { font: inherit; font-size: 13px; padding: 6px 10px; border-radius: 6px;
+           border: 1px solid var(--border); background: var(--surface-1); color: var(--text-primary); }
+button { cursor: pointer; }
+button:hover { background: var(--surface-2); }
+#q { flex: 1 1 240px; min-width: 0; }
+.count { font-size: 13px; color: var(--text-secondary); margin: 10px 0; }
+.table-wrap { overflow-x: auto; background: var(--surface-1); border: 1px solid var(--border); border-radius: 12px; }
+table { border-collapse: collapse; width: 100%; font-size: 13px; }
+th, td { text-align: left; padding: 7px 10px; border-bottom: 1px solid var(--grid); vertical-align: top; }
+th { font-weight: 600; color: var(--text-secondary); position: sticky; top: 0; background: var(--surface-1); }
+td.month { white-space: nowrap; font-variant-numeric: tabular-nums; color: var(--text-secondary); }
+td.title a { color: var(--text-primary); text-decoration: none; font-weight: 500; }
+td.title a:hover { text-decoration: underline; }
+.why { display: block; font-size: 11px; color: var(--muted); }
+.why code { font-size: 11px; background: var(--surface-2); padding: 0 4px; border-radius: 3px; }
+.catcell { display: flex; align-items: baseline; white-space: nowrap; }
+.more { display: block; margin: 12px auto; }
+details { background: var(--surface-1); border: 1px solid var(--border); border-radius: 12px; padding: 12px 16px; margin-top: 24px; font-size: 13px; }
+details summary { cursor: pointer; font-weight: 600; }
+details ol { padding-left: 20px; }
+details li { margin: 6px 0; }
+details code { font-size: 11px; color: var(--text-secondary); background: var(--surface-2); padding: 1px 5px; border-radius: 4px; margin: 2px 4px 2px 0; display: inline-block; }
+details .kws { margin-top: 4px; }
+.foot { font-size: 12px; color: var(--muted); margin-top: 16px; }
+@media (max-width: 760px) { .hide-sm { display: none; } }
+</style>
+</head>
+<body>
+<main>
+<nav><a href="index.html#clock">Clock</a><a href="index.html#mix">Hiring mix</a><a href="index.html#engineering">Engineering</a><a href="index.html#salary">Salary</a><a href="explorer.html" aria-current="page">Job explorer</a></nav>
+<header>
+  <h1>Job post explorer</h1>
+  <p>Every new posting behind the dashboard, with the category and seniority it was given. Categories come from keyword rules on the job title. Each row shows the keyword that matched, so you can see why a job landed where it did.</p>
+</header>
+
+<h2>Categories at a glance</h2>
+<div class="cats" id="cats"></div>
+
+<h2 id="list">All postings</h2>
+<div class="filters" role="search">
+  <input id="q" type="search" placeholder="Search title, team or location…" aria-label="Search">
+  <select id="cat" aria-label="Category"><option value="">All categories</option></select>
+  <select id="sen" aria-label="Seniority"><option value="">All seniority</option></select>
+  <label for="from">From</label><select id="from"></select>
+  <label for="to">to</label><select id="to"></select>
+  <label for="sort">Sort</label>
+  <select id="sort"><option value="newest">Newest first</option><option value="sal_desc">Salary: high to low</option>
+    <option value="sal_asc">Salary: low to high</option><option value="random">Random sample</option></select>
+  <button id="reset">Reset</button>
+</div>
+<p class="count" id="count"></p>
+<div class="table-wrap">
+  <table>
+    <thead><tr><th>Posted</th><th>Title</th><th>Category</th><th>Seniority</th><th>Salary</th><th class="hide-sm">Team</th><th class="hide-sm">Location</th></tr></thead>
+    <tbody id="rows"></tbody>
+  </table>
+</div>
+<button class="more" id="more">Show more</button>
+
+<details>
+  <summary>How categories are assigned</summary>
+  <p>Rules are checked top to bottom against the job title (case-insensitive); each rule matches any of its keywords (regular expressions, <code>\b</code> = word boundary). The first rule that matches decides the category; titles matching none go to Other. Earlier rules exist to catch titles that would otherwise be misfiled, e.g. “User Experience Researcher” is Design, not Research.</p>
+  <ol id="rules"></ol>
+</details>
+
+<p class="foot" id="foot"></p>
+</main>
+
+<script>
+const D = /*__DATA__*/null;
+const COL = Object.fromEntries(D.columns.map((c, i) => [c, i]));
+const SLOT = ["--s1", "--s2", "--s3", "--s4", "--s5", "--s6", "--s7", "--s-other"];
+const catColor = c => `var(${SLOT[D.categories.indexOf(c)]})`;
+const esc = s => String(s ?? "").replace(/[&<>"']/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[ch]));
+const monthLabel = m => new Date(m + "-01T00:00:00").toLocaleDateString("en", { month: "short", year: "numeric" });
+const stem = t => t.split(/,| - | – | \(|\|/)[0].trim();   // "Software Engineer, Platform" → "Software Engineer"
+const PAGE = 100;
+
+const $ = id => document.getElementById(id);
+let shown = PAGE, randomKey = null;
+const SYM = { USD: "$", GBP: "£", EUR: "€", CAD: "C$" };
+const k = v => v >= 1e6 ? (v / 1e6).toFixed(2).replace(/\.?0+$/, "") + "M" : Math.round(v / 1000) + "k";
+function salaryText(r) {
+  const lo = r[COL.salary_min], hi = r[COL.salary_max], cur = r[COL.currency];
+  if (lo == null) return "<span class='why'>not listed</span>";
+  const sym = SYM[cur] ?? "", tail = sym ? "" : " " + (cur ?? "");
+  return (lo === hi ? sym + k(lo) : `${sym}${k(lo)}–${sym}${k(hi)}`) + tail + (cur && cur !== "USD" ? `<span class="why">${esc(cur)}</span>` : "");
+}
+const mid = r => r[COL.salary_min] == null ? null : (r[COL.salary_min] + r[COL.salary_max]) / 2;
+
+// Category overview cards.
+function renderCats() {
+  const total = D.rows.length;
+  $("cats").innerHTML = D.categories.map(c => {
+    const rs = D.rows.filter(r => r[COL.category] === c), n = rs.length;
+    const stems = {};
+    for (const r of rs) { const s = stem(r[COL.title]); stems[s] = (stems[s] || 0) + 1; }
+    const top = Object.entries(stems).sort((a, b) => b[1] - a[1]).slice(0, 6);
+    return `<div class="cat">
+      <div class="cat-head"><span class="sw" style="background:${catColor(c)}"></span>${esc(c)}<span class="cat-n">${n.toLocaleString()}</span></div>
+      <div class="cat-share">${(100 * n / total).toFixed(1)}% of postings · ${Object.keys(stems).length} distinct title stems</div>
+      <div class="bar"><span style="width:${(100 * n / total).toFixed(1)}%;background:${catColor(c)}"></span></div>
+      <ol>${top.map(([s, k]) => `<li><span title="${esc(s)}">${esc(s)}</span><span>${k}</span></li>`).join("")}</ol>
+      <button data-cat="${esc(c)}">View ${n.toLocaleString()} postings →</button>
+    </div>`;
+  }).join("");
+  $("cats").querySelectorAll("button[data-cat]").forEach(b => b.onclick = () => {
+    $("cat").value = b.dataset.cat; shown = PAGE; renderRows(); $("list").scrollIntoView({ behavior: "smooth" });
+  });
+}
+
+function filtered() {
+  const q = $("q").value.trim().toLowerCase(), c = $("cat").value, s = $("sen").value;
+  const a = D.months[+$("from").value], b = D.months[+$("to").value];
+  const lo = a < b ? a : b, hi = a < b ? b : a;
+  let rs = D.rows.filter(r =>
+    (!c || r[COL.category] === c) && (!s || r[COL.seniority] === s) &&
+    r[COL.month] >= lo && r[COL.month] <= hi &&
+    (!q || `${r[COL.title]} ${r[COL.team]} ${r[COL.location]}`.toLowerCase().includes(q)));
+  const sort = $("sort").value;
+  if (sort === "random") rs = rs.slice().sort((x, y) => randomKey.get(x[COL.id]) - randomKey.get(y[COL.id]));
+  if (sort.startsWith("sal")) {
+    // USD first (comparable), then other currencies, then postings without a range.
+    const dir = sort === "sal_desc" ? -1 : 1;
+    const rank = r => r[COL.salary_min] == null ? 2 : r[COL.currency] === "USD" ? 0 : 1;
+    rs = rs.slice().sort((x, y) => rank(x) - rank(y) || dir * (mid(x) - mid(y)));
+  }
+  return rs;
+}
+
+function renderRows() {
+  const rs = filtered();
+  $("count").textContent = `Showing ${Math.min(shown, rs.length).toLocaleString()} of ${rs.length.toLocaleString()} postings` +
+    " · " + $("sort").selectedOptions[0].text.toLowerCase() + ($("sort").value.startsWith("sal") ? " (USD first)" : "");
+  $("rows").innerHTML = rs.slice(0, shown).map(r => `<tr>
+    <td class="month">${monthLabel(r[COL.month])}</td>
+    <td class="title"><a href="${esc(r[COL.archive])}" target="_blank" rel="noopener" title="Open the archived posting (Wayback Machine)">${esc(r[COL.title])}</a></td>
+    <td><span class="catcell"><span class="sw" style="background:${catColor(r[COL.category])}"></span>${esc(r[COL.category])}</span>
+        <span class="why">${r[COL.category_kw] ? `matched <code>${esc(r[COL.category_kw])}</code>` : "no rule matched"}</span></td>
+    <td>${esc(r[COL.seniority])}<span class="why">${r[COL.seniority_kw] ? `matched <code>${esc(r[COL.seniority_kw])}</code>` : "default"}</span></td>
+    <td class="month">${salaryText(r)}</td>
+    <td class="hide-sm">${esc(r[COL.team]) || "<span class='why'>—</span>"}</td>
+    <td class="hide-sm">${esc(r[COL.location])}</td></tr>`).join("") ||
+    `<tr><td colspan="7">No postings match these filters.</td></tr>`;
+  $("more").hidden = shown >= rs.length;
+}
+
+function init() {
+  for (const c of D.categories) $("cat").insertAdjacentHTML("beforeend", `<option>${esc(c)}</option>`);
+  for (const s of D.seniority) $("sen").insertAdjacentHTML("beforeend", `<option>${esc(s)}</option>`);
+  for (const id of ["from", "to"]) $(id).innerHTML = D.months.map((m, i) => `<option value="${i}">${monthLabel(m)}</option>`).join("");
+  $("from").value = 0; $("to").value = D.months.length - 1;
+  $("rules").innerHTML = D.rules.map(([label, alts]) =>
+    `<li><span class="catcell"><span class="sw" style="background:${catColor(label)}"></span><strong>${esc(label)}</strong></span>
+     <div class="kws">${alts.map(a => `<code>${esc(a)}</code>`).join("")}</div></li>`).join("");
+  $("foot").textContent = `${D.rows.length.toLocaleString()} postings, ${monthLabel(D.months[0])}–${monthLabel(D.months[D.months.length - 1])}. ` +
+    `Salary = posted base range as listed (sales roles show on-target earnings; equity not included). Titles link to the earliest archived copy on the Wayback Machine. Data derived from Anthropic's public Greenhouse job board and Internet Archive snapshots; descriptions are not redistributed. Generated ${D.generated}.`;
+
+  for (const id of ["q", "cat", "sen", "from", "to", "sort"]) $(id).addEventListener("input", () => {
+    if (id === "sort" && $("sort").value === "random") randomKey = new Map(D.rows.map(r => [r[COL.id], Math.random()]));
+    shown = PAGE; renderRows();
+  });
+  $("more").onclick = () => { shown += PAGE; renderRows(); };
+  $("reset").onclick = () => {
+    $("q").value = ""; $("cat").value = ""; $("sen").value = ""; $("from").value = 0; $("to").value = D.months.length - 1;
+    $("sort").value = "newest"; shown = PAGE; renderRows();
+  };
+  const hashCat = decodeURIComponent(location.hash.replace(/^#category=/, ""));
+  if (D.categories.includes(hashCat)) $("cat").value = hashCat;
+  renderCats(); renderRows();
+}
+init();
+</script>
+</body>
+</html>

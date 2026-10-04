@@ -1,0 +1,22 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Install test dependencies
+        # Only what the tests import; the full requirements (spaCy, Presidio) are not needed here.
+        run: pip install $(grep -E '^(pytest|pandas|pyarrow|beautifulsoup4|lxml|PyYAML|requests)==' requirements.txt)
+      - name: Run tests (including the privacy guard)
+        run: python -m pytest -q

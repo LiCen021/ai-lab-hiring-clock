@@ -1,0 +1,423 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI Lab Hiring Clock</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/plotly.js/3.1.0/plotly.min.js"></script>
+<style>
+:root {
+  color-scheme: light;
+  --page: #f9f9f7; --surface-1: #fcfcfb;
+  --text-primary: #0b0b0b; --text-secondary: #52514e; --muted: #898781;
+  --grid: #e1e0d9; --axis: #c3c2b7; --border: rgba(11,11,11,0.10);
+  --shade: rgba(137,135,129,0.12);
+  --up: #006300; --down: #d03b3b;
+  --s1: #2a78d6; --s2: #eb6834; --s3: #1baf7a; --s4: #eda100;
+  --s5: #e87ba4; --s6: #008300; --s7: #4a3aa7; --s-other: #a8a7a0;
+  --then: #a8a7a0;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --page: #0d0d0d; --surface-1: #1a1a19;
+    --text-primary: #ffffff; --text-secondary: #c3c2b7; --muted: #898781;
+    --grid: #2c2c2a; --axis: #383835; --border: rgba(255,255,255,0.10);
+    --shade: rgba(195,194,183,0.08);
+    --up: #0ca30c; --down: #e66767;
+    --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500;
+    --s5: #d55181; --s6: #008300; --s7: #9085e9; --s-other: #6b6a64;
+    --then: #6b6a64;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --page: #0d0d0d; --surface-1: #1a1a19;
+  --text-primary: #ffffff; --text-secondary: #c3c2b7; --muted: #898781;
+  --grid: #2c2c2a; --axis: #383835; --border: rgba(255,255,255,0.10);
+  --shade: rgba(195,194,183,0.08);
+  --up: #0ca30c; --down: #e66767;
+  --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500;
+  --s5: #d55181; --s6: #008300; --s7: #9085e9; --s-other: #6b6a64;
+  --then: #6b6a64;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--page); color: var(--text-primary);
+       font: 15px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
+main { max-width: 1080px; margin: 0 auto; padding: 24px 16px 64px; }
+nav { display: flex; gap: 16px; font-size: 14px; margin-bottom: 12px; }
+nav a { text-decoration: none; color: var(--text-secondary); }
+nav a[aria-current="page"] { color: var(--text-primary); font-weight: 600; }
+header h1 { font-size: 26px; margin: 0 0 4px; letter-spacing: -0.01em; }
+header p { margin: 0; color: var(--text-secondary); max-width: 760px; }
+.banner { margin: 16px 0; padding: 10px 14px; border: 1px solid var(--border); border-radius: 8px;
+          background: var(--surface-1); color: var(--text-secondary); font-size: 13px; }
+.filters { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 16px 0 20px;
+           position: sticky; top: 0; z-index: 5; background: var(--page); padding: 8px 0; }
+.filters label { font-size: 13px; color: var(--text-secondary); }
+.filters select, .filters button { font: inherit; font-size: 13px; padding: 5px 10px; border-radius: 6px;
+           border: 1px solid var(--border); background: var(--surface-1); color: var(--text-primary); cursor: pointer; }
+.filters button[aria-pressed="true"] { border-color: var(--text-primary); font-weight: 600; }
+.card { background: var(--surface-1); border: 1px solid var(--border); border-radius: 12px; padding: 18px 20px; margin-bottom: 16px; }
+.card h2 { font-size: 16px; margin: 0 0 2px; }
+.card .sub { font-size: 13px; color: var(--text-secondary); margin: 0 0 8px; }
+.foot { font-size: 12px; color: var(--muted); margin: 6px 0 0; }
+.hero { display: grid; grid-template-columns: 260px 1fr; gap: 24px; align-items: center; }
+.clock-wrap { text-align: center; }
+.clock-time { font-size: 40px; font-weight: 700; margin-top: 4px; }
+.clock-label { color: var(--text-secondary); font-size: 14px; }
+.tiles { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+.tile { border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; }
+.tile .k { font-size: 13px; color: var(--text-secondary); }
+.tile .v { font-size: 28px; font-weight: 700; line-height: 1.2; }
+.tile .d { font-size: 13px; color: var(--text-secondary); }
+.tile .na { font-size: 14px; color: var(--muted); padding-top: 6px; }
+.up { color: var(--up); } .down { color: var(--down); }
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.chart { width: 100%; height: 360px; }
+.hero > *, .grid2 > *, .card { min-width: 0; }
+details { margin-top: 8px; font-size: 13px; color: var(--text-secondary); }
+table { border-collapse: collapse; font-variant-numeric: tabular-nums; margin-top: 8px; width: 100%; }
+th, td { padding: 3px 6px; text-align: right; border-bottom: 1px solid var(--grid); white-space: nowrap; }
+th:first-child, td:first-child { text-align: left; }
+.table-scroll { overflow-x: auto; }
+.tabs { display: flex; flex-wrap: wrap; gap: 4px; border-bottom: 1px solid var(--grid); margin-bottom: 4px; }
+.tabs a { text-decoration: none; color: var(--text-secondary); padding: 8px 12px; font-size: 14px; border-bottom: 2px solid transparent; margin-bottom: -1px; }
+.tabs a[aria-current="page"] { color: var(--text-primary); font-weight: 600; border-bottom-color: var(--text-primary); }
+.front { text-align: center; padding: 16px 0 24px; }
+.front h1 { font-size: 30px; margin: 8px 0 6px; letter-spacing: -0.01em; }
+.lede { color: var(--text-secondary); max-width: 620px; margin: 0 auto 20px; }
+#clock { width: min(320px, 80vw); height: auto; }
+.front .clock-time { font-size: 56px; }
+.front .clock-label { font-size: 16px; }
+.note { font-size: 13px; color: var(--text-secondary); max-width: 760px; }
+footer { margin-top: 32px; padding-top: 12px; border-top: 1px solid var(--grid); font-size: 12px; color: var(--muted); }
+footer p { margin: 4px 0; }
+code { font-size: 12px; }
+@media (max-width: 760px) {
+  .hero, .grid2 { grid-template-columns: 1fr; }
+  .tiles { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+<main>
+<nav class="tabs" aria-label="Sections">
+  <a href="#clock" data-tab="clock">Clock</a>
+  <a href="#mix" data-tab="mix">Hiring mix</a>
+  <a href="#engineering" data-tab="engineering">Engineering</a>
+  <a href="#salary" data-tab="salary">Salary</a>
+  <a href="explorer.html">Job explorer</a>
+</nav>
+
+<div class="filters" role="group" aria-label="Date range">
+  <label for="from">From</label><select id="from"></select>
+  <label for="to">to</label><select id="to"></select>
+  <button data-preset="all">All</button>
+  <button data-preset="12">Last 12 months</button>
+  <button data-preset="2025">2025</button>
+  <button data-preset="2026">2026</button>
+</div>
+
+<!-- ── Front page: the clock ─────────────────────────────────────────── -->
+<div data-panel="clock">
+  <section class="front">
+    <h1>AI Lab Hiring Clock</h1>
+    <p class="lede">How close is software engineering to midnight at a frontier AI lab? The clock tracks software engineering's share of Anthropic's new job postings.</p>
+    <svg id="clock" viewBox="0 0 220 220" role="img" aria-labelledby="clock-title"><title id="clock-title"></title></svg>
+    <div class="clock-time" id="clock-time"></div>
+    <div class="clock-label" id="clock-label"></div>
+  </section>
+
+  <section class="card">
+    <h2>Software engineering share of new postings</h2>
+    <p class="sub">Trailing 3-month share. The dashed line is the baseline the clock is measured against.</p>
+    <div id="swe-trend" class="chart"></div>
+    <p class="foot" id="clock-formula"></p>
+  </section>
+
+  <p class="note">The clock is a visual hook, not a causal claim. One company's hiring mix mostly reflects its growth stage, funding and strategy, so a falling engineering share is not evidence of AI replacing engineers. See the other tabs for the full mix.</p>
+</div>
+
+<!-- ── Hiring mix ────────────────────────────────────────────────────── -->
+<div data-panel="mix" hidden>
+  <section class="card">
+    <h2>New postings per month, by category</h2>
+    <p class="sub">Count of jobs by month first published on the board.</p>
+    <div id="counts" class="chart"></div>
+    <p class="foot cov"></p>
+  </section>
+  <section class="card">
+    <h2>Share of new postings by category</h2>
+    <p class="sub">Each month's new postings split to 100%.</p>
+    <div id="share" class="chart"></div>
+    <p class="foot cov"></p>
+  </section>
+  <section class="card">
+    <h2>Then vs now</h2>
+    <p class="sub" id="radar-sub"></p>
+    <div id="radar" class="chart" style="height:420px"></div>
+    <p class="foot cov"></p>
+  </section>
+  <section class="card">
+    <h2>Data table</h2>
+    <details><summary>New postings per month by category</summary><div class="table-scroll" id="table"></div></details>
+  </section>
+</div>
+
+<!-- ── Engineering ───────────────────────────────────────────────────── -->
+<div data-panel="engineering" hidden>
+  <section class="card">
+    <h2>Key numbers</h2>
+    <p class="sub" id="tiles-sub"></p>
+    <div class="tiles" id="tiles"></div>
+  </section>
+  <section class="card">
+    <h2>Engineering seniority mix</h2>
+    <p class="sub">Software + Applied/ML engineering, trailing 3-month share.</p>
+    <div id="seniority" class="chart"></div>
+    <p class="foot">Senior+ = senior, staff/principal and people managers. From title keywords only. <span class="cov"></span></p>
+  </section>
+</div>
+
+<!-- ── Salary ────────────────────────────────────────────────────────── -->
+<div data-panel="salary" hidden>
+  <section class="card">
+    <h2>Posted salary by category</h2>
+    <p class="sub">Median midpoint of the posted USD salary range, per quarter. Click a legend entry to show or hide a category.</p>
+    <div id="salary-trend" class="chart"></div>
+    <p class="foot salfoot"></p>
+  </section>
+  <section class="card">
+    <h2>Where the posted pay points</h2>
+    <p class="sub">Each category's share of postings vs its share of posted salary weight (sum of USD range midpoints), in the selected range.</p>
+    <div id="salary-weight" class="chart" style="height:400px"></div>
+    <p class="foot salfoot"></p>
+  </section>
+</div>
+
+<footer>
+  <p><strong>Prototype · job titles only.</strong> Category and seniority come from keyword rules on the job title; no descriptions or LLM tags are used yet.</p>
+  <p id="method"></p>
+</footer>
+</main>
+
+<script>
+const D = /*__DATA__*/null;
+const M = D.months, C = D.categories;
+const SWE = C.indexOf("Software engineering"), AML = C.indexOf("Applied / ML engineering");
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const colors = () => [css("--s1"), css("--s2"), css("--s3"), css("--s4"), css("--s5"), css("--s6"), css("--s7"), css("--s-other")];
+const pct = (x, d = 0) => x == null || isNaN(x) ? "—" : (100 * x).toFixed(d) + "%";
+const monthLabel = m => new Date(m + "-01T00:00:00").toLocaleDateString("en", { month: "short", year: "numeric" });
+const xDate = i => M[i] + "-01";
+
+// Counts per month × category, and per month × engineering seniority, over ALL data.
+const counts = M.map(() => C.map(() => 0));
+const sen = M.map(() => [0, 0, 0]);   // junior, mid, senior+ (engineering only)
+for (const [m, c, s] of D.jobs) {
+  counts[m][c]++;
+  if (c === SWE || c === AML) sen[m][s === 0 ? 0 : s === 1 ? 1 : 2]++;
+}
+const total = i => counts[i].reduce((a, b) => a + b, 0);
+
+// Trailing-3-month helpers ending at month index e (inclusive), never reaching before `lo`.
+function window3(e, lo = 0) { const a = Math.max(lo, e - 2); return e < 0 ? [] : Array.from({ length: e - a + 1 }, (_, k) => a + k); }
+function sweShare(ix) { let s = 0, t = 0; for (const i of ix) { s += counts[i][SWE]; t += total(i); } return t ? s / t : null; }
+function juniorShare(ix) { let j = 0, t = 0; for (const i of ix) { j += sen[i][0]; t += sen[i][0] + sen[i][1] + sen[i][2]; } return t ? j / t : null; }
+function perMonth(ix) { return ix.length ? ix.reduce((a, i) => a + total(i), 0) / ix.length : null; }
+
+// Clock baseline = first full quarter of data; fixed so it never drifts with filters.
+const BASE_IX = [0, 1, 2], BASE = sweShare(BASE_IX);
+
+let lo = 0, hi = M.length - 1;
+
+function fillSelects() {
+  for (const id of ["from", "to"]) {
+    const el = document.getElementById(id);
+    el.innerHTML = M.map((m, i) => `<option value="${i}">${monthLabel(m)}</option>`).join("");
+  }
+}
+function setRange(a, b) {
+  lo = Math.min(a, b); hi = Math.max(a, b);
+  document.getElementById("from").value = lo; document.getElementById("to").value = hi;
+  document.querySelectorAll("[data-preset]").forEach(b => b.setAttribute("aria-pressed", "false"));
+  render();
+}
+
+function drawClock(minutes) {
+  const svg = document.getElementById("clock"), ink = css("--text-primary"), mut = css("--muted"), crit = css("--down");
+  const cx = 110, cy = 110, r = 96;
+  let h = `<title id="clock-title">Clock at ${clockTime(minutes)}</title>`;
+  h += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="${css("--surface-1")}" stroke="${css("--axis")}" stroke-width="2"/>`;
+  for (let k = 0; k < 60; k++) {
+    const a = k / 60 * 2 * Math.PI, big = k % 5 === 0, r1 = r - (big ? 14 : 6);
+    const col = k === 0 ? crit : big ? ink : mut;
+    h += `<line x1="${cx + r1 * Math.sin(a)}" y1="${cy - r1 * Math.cos(a)}" x2="${cx + (r - 3) * Math.sin(a)}" y2="${cy - (r - 3) * Math.cos(a)}" stroke="${col}" stroke-width="${k === 0 ? 4 : big ? 2 : 1}" stroke-linecap="round"/>`;
+  }
+  // Minutes before midnight → the minute hand sits at (60 - minutes), hour hand just before 12.
+  const mm = (60 - minutes) % 60, frac = minutes === 0 ? 0 : (11 + mm / 60) / 12;
+  const ma = mm / 60 * 2 * Math.PI, ha = frac * 2 * Math.PI;
+  // Arc showing the time left until midnight.
+  if (minutes > 0 && minutes < 60) {
+    const ar = r - 24, large = minutes > 30 ? 1 : 0;
+    h += `<path d="M ${cx + ar * Math.sin(ma)} ${cy - ar * Math.cos(ma)} A ${ar} ${ar} 0 ${large} 1 ${cx} ${cy - ar}" fill="none" stroke="${crit}" stroke-opacity="0.35" stroke-width="6" stroke-linecap="round"/>`;
+  }
+  h += `<line x1="${cx}" y1="${cy}" x2="${cx + 50 * Math.sin(ha)}" y2="${cy - 50 * Math.cos(ha)}" stroke="${ink}" stroke-width="6" stroke-linecap="round"/>`;
+  h += `<line x1="${cx}" y1="${cy}" x2="${cx + 78 * Math.sin(ma)}" y2="${cy - 78 * Math.cos(ma)}" stroke="${ink}" stroke-width="3" stroke-linecap="round"/>`;
+  h += `<circle cx="${cx}" cy="${cy}" r="5" fill="${ink}"/>`;
+  svg.innerHTML = h;
+}
+function clockMinutes(share) { return share == null ? null : Math.max(0, Math.min(60, Math.round(30 * share / BASE))); }
+function clockTime(minutes) { return minutes == null ? "—" : minutes === 0 ? "12:00" : `11:${String(60 - minutes).padStart(2, "0")}`; }
+
+function delta(now, ago, fmt, betterUp = null) {
+  if (now == null || ago == null) return `<span class="d">no year-ago data in range</span>`;
+  const diff = now - ago, arrow = diff > 0 ? "▲" : diff < 0 ? "▼" : "■";
+  const cls = betterUp == null || diff === 0 ? "" : (diff > 0) === betterUp ? "up" : "down";
+  return `<span class="d"><span class="${cls}">${arrow} ${fmt(Math.abs(diff))}</span> from ${fmt(ago)} a year earlier</span>`;
+}
+
+function render() {
+  const ix = window3(hi, lo), agoIx = window3(hi - 12, lo);
+  const now = sweShare(ix), ago = agoIx.length ? sweShare(agoIx) : null;
+  const mins = clockMinutes(now);
+  drawClock(mins ?? 30);
+  document.getElementById("clock-time").textContent = clockTime(mins);
+  document.getElementById("clock-label").innerHTML = `SWE share: <strong>${pct(now, 1)}</strong>` +
+    (ago != null ? `<br>a year earlier: ${pct(ago, 1)} (${clockTime(clockMinutes(ago))})` : "");
+  document.getElementById("tiles-sub").textContent =
+    `Trailing 3 months to ${monthLabel(M[hi])}, compared with the 3 months to ${hi - 12 >= lo ? monthLabel(M[hi - 12]) : "—"}.`;
+  document.getElementById("clock-formula").textContent =
+    `Clock: minutes to midnight = 30 × (current SWE share ÷ baseline SWE share), clamped to 0–60. Baseline = ${monthLabel(M[0])}–${monthLabel(M[2])} SWE share (${pct(BASE, 1)}), fixed. Fewer minutes = engineering a smaller part of hiring.`;
+
+  const n25 = D.jobs.filter(j => M[j[0]].startsWith("2025")).length;
+  const jNow = juniorShare(ix), jAgo = agoIx.length ? juniorShare(agoIx) : null;
+  const pNow = perMonth(ix), pAgo = agoIx.length ? perMonth(agoIx) : null;
+  document.getElementById("tiles").innerHTML = [
+    `<div class="tile"><div class="k">SWE share of new postings</div><div class="v">${pct(now, 1)}</div>${delta(now, ago, x => pct(x, 1))}</div>`,
+    `<div class="tile"><div class="k">Junior share of engineering</div><div class="v">${pct(jNow, 1)}</div>${delta(jNow, jAgo, x => pct(x, 1))}</div>`,
+    `<div class="tile"><div class="k">New postings per month</div><div class="v">${pNow == null ? "—" : Math.round(pNow)}</div>${delta(pNow, pAgo, x => Math.round(x).toString())}</div>`,
+    `<div class="tile"><div class="k">AI-skill mention rate</div><div class="na">Needs description tagging (build step 4). Not derivable from titles.</div></div>`,
+  ].join("");
+
+  const xs = []; for (let i = lo; i <= hi; i++) xs.push(i);
+  const col = colors(), ink = css("--text-secondary"), grid = css("--grid"), surf = css("--surface-1");
+  const shapes = D.low_coverage.map(([a, b]) => ({ type: "rect", xref: "x", yref: "paper", y0: 0, y1: 1,
+    x0: a + "-01", x1: new Date(new Date(b + "-01").setMonth(new Date(b + "-01").getMonth() + 1)).toISOString().slice(0, 10),
+    fillcolor: css("--shade"), line: { width: 0 }, layer: "below" }));
+  const base = (extra = {}) => ({
+    paper_bgcolor: surf, plot_bgcolor: surf, font: { family: "system-ui, -apple-system, Segoe UI, sans-serif", size: 12, color: ink },
+    margin: { l: 44, r: 12, t: 8, b: 36 }, hovermode: "x unified", shapes,
+    xaxis: { type: "date", tickformat: "%b %Y", gridcolor: grid, linecolor: css("--axis"), hoverformat: "%b %Y" },
+    yaxis: { gridcolor: grid, zeroline: false, linecolor: css("--axis") },
+    legend: { orientation: "h", y: -0.18, font: { size: 12 }, traceorder: "normal" }, hoverlabel: { bgcolor: surf, bordercolor: css("--axis"), font: { color: css("--text-primary") } },
+    ...extra });
+  const cfg = { displayModeBar: false, responsive: true };
+
+  // Front page: the evidence behind the clock.
+  const trend = xs.map(i => { const v = sweShare(window3(i)); return v == null ? null : 100 * v; });
+  Plotly.react("swe-trend", [{ type: "scatter", mode: "lines+markers", name: "SWE share", x: xs.map(xDate), y: trend,
+    line: { width: 2, color: col[0] }, marker: { size: 6, color: col[0], line: { color: surf, width: 2 } },
+    hovertemplate: "%{y:.1f}% <span style='opacity:.7'>(3 months to %{x|%b %Y})</span><extra></extra>" }],
+    base({ showlegend: false, hovermode: "closest",
+           yaxis: { gridcolor: grid, ticksuffix: "%", rangemode: "tozero", zeroline: false },
+           shapes: [...shapes, { type: "line", xref: "paper", x0: 0, x1: 1, y0: 100 * BASE, y1: 100 * BASE,
+                                  line: { color: css("--muted"), width: 1.5, dash: "dash" } }],
+           annotations: [{ xref: "paper", x: 1, y: 100 * BASE, yanchor: "bottom", xanchor: "right", showarrow: false,
+                           text: `baseline ${pct(BASE, 1)} = 11:30`, font: { size: 11, color: css("--muted") } }] }), cfg);
+
+  Plotly.react("counts", C.map((c, k) => ({ type: "bar", name: c, x: xs.map(xDate), y: xs.map(i => counts[i][k]),
+    marker: { color: col[k], line: { color: surf, width: 1 } }, hovertemplate: "%{y}<extra>" + c + "</extra>" })),
+    base({ barmode: "stack", bargap: 0.25, yaxis: { gridcolor: grid, zeroline: false, title: { text: "postings" } } }), cfg);
+
+  Plotly.react("share", C.map((c, k) => ({ type: "scatter", mode: "lines", name: c, stackgroup: "one",
+    x: xs.map(xDate), y: xs.map(i => total(i) ? 100 * counts[i][k] / total(i) : 0), line: { width: 1, color: surf }, fillcolor: col[k],
+    hovertemplate: "%{y:.1f}%<extra>" + c + "</extra>" })),
+    base({ yaxis: { gridcolor: grid, ticksuffix: "%", range: [0, 100], zeroline: false } }), cfg);
+
+  const senNames = ["Junior", "Mid", "Senior+"];
+  Plotly.react("seniority", senNames.map((n, k) => ({ type: "scatter", mode: "lines", name: n, x: xs.map(xDate),
+    y: xs.map(i => { const w = window3(i, lo); let a = 0, t = 0; for (const j of w) { a += sen[j][k]; t += sen[j][0] + sen[j][1] + sen[j][2]; } return t ? 100 * a / t : null; }),
+    line: { width: 2, color: col[k] }, hovertemplate: "%{y:.1f}%<extra>" + n + "</extra>" })),
+    base({ yaxis: { gridcolor: grid, ticksuffix: "%", rangemode: "tozero", zeroline: false } }), cfg);
+
+  // Radar: first full quarter in range vs the latest quarter in range.
+  const q0 = [lo, lo + 1, lo + 2].filter(i => i <= hi), q1 = window3(hi, lo);
+  const shares = q => { const t = q.reduce((a, i) => a + total(i), 0); return C.map((_, k) => t ? 100 * q.reduce((a, i) => a + counts[i][k], 0) / t : 0); };
+  const qLabel = q => `${monthLabel(M[q[0]])}–${monthLabel(M[q[q.length - 1]])}`;
+  document.getElementById("radar-sub").textContent = `Category share of new postings, ${qLabel(q0)} vs ${qLabel(q1)}.`;
+  const theta = [...C, C[0]], close = a => [...a, a[0]];
+  Plotly.react("radar", [
+    { type: "scatterpolar", name: "Then · " + qLabel(q0), r: close(shares(q0)), theta, fill: "toself", line: { color: css("--then"), width: 2 }, fillcolor: "rgba(137,135,129,0.15)", hovertemplate: "%{theta}: %{r:.1f}%<extra>then</extra>" },
+    { type: "scatterpolar", name: "Now · " + qLabel(q1), r: close(shares(q1)), theta, fill: "toself", line: { color: col[0], width: 2 }, fillcolor: "rgba(42,120,214,0.15)", hovertemplate: "%{theta}: %{r:.1f}%<extra>now</extra>" },
+  ], { paper_bgcolor: surf, font: { family: "system-ui, sans-serif", size: 11, color: ink }, margin: { l: 96, r: 96, t: 24, b: 40 },
+       polar: { bgcolor: surf, radialaxis: { ticksuffix: "%", gridcolor: grid, linecolor: grid, angle: 90, tickfont: { size: 10 } }, angularaxis: { gridcolor: grid, linecolor: css("--axis") } },
+       legend: { orientation: "h", y: -0.12 }, showlegend: true }, cfg);
+
+  // Salary: USD midpoints only.
+  const median = a => { if (!a.length) return null; const b = a.slice().sort((x, y) => x - y), h = b.length >> 1; return b.length % 2 ? b[h] : (b[h - 1] + b[h]) / 2; };
+  const inRange = D.jobs.filter(j => j[0] >= lo && j[0] <= hi), paid = inRange.filter(j => j[3] != null);
+  const qOf = i => M[i].slice(0, 4) + "-" + String(Math.floor((+M[i].slice(5, 7) - 1) / 3) * 3 + 1).padStart(2, "0");
+  const quarters = [...new Set(xs.map(qOf))];
+  const DEFAULT_ON = new Set(["Software engineering", "Applied / ML engineering", "Research", "Sales & GTM", "Ops, finance & people"]);
+  Plotly.react("salary-trend", C.map((c, k) => ({ type: "scatter", mode: "lines+markers", name: c,
+    visible: DEFAULT_ON.has(c) ? true : "legendonly",
+    x: quarters.map(q => q + "-01"),
+    y: quarters.map(q => { const v = paid.filter(j => j[1] === k && qOf(j[0]) === q).map(j => j[3]); return v.length >= 5 ? median(v) : null; }),
+    line: { width: 2, color: col[k] }, marker: { size: 7, color: col[k], line: { color: surf, width: 2 } },
+    connectgaps: false, hovertemplate: "$%{y:,.0f}<extra>" + c + "</extra>" })),
+    base({ hovermode: "closest", yaxis: { gridcolor: grid, zeroline: false, tickprefix: "$", tickformat: "~s" },
+           xaxis: { type: "date", tickformat: "Q%q %Y", gridcolor: grid, linecolor: css("--axis"), hoverformat: "Q%q %Y" } }), cfg);
+
+  const totN = paid.length, totPay = paid.reduce((a, j) => a + j[3], 0);
+  const order = C.map((_, k) => k).reverse();   // first category at the top
+  const bar = (name, color, f) => ({ type: "bar", orientation: "h", name, y: order.map(k => C[k]), x: order.map(f),
+    marker: { color, line: { color: surf, width: 1 } }, hovertemplate: "%{x:.1f}%<extra>" + name + "</extra>" });
+  Plotly.react("salary-weight", [
+    bar("Share of postings", css("--then"), k => totN ? 100 * paid.filter(j => j[1] === k).length / totN : 0),
+    bar("Share of posted salary weight", col[0], k => totPay ? 100 * paid.filter(j => j[1] === k).reduce((a, j) => a + j[3], 0) / totPay : 0),
+  ], base({ barmode: "group", bargap: 0.3, bargroupgap: 0.1, hovermode: "y unified", shapes: [], margin: { l: 170, r: 16, t: 8, b: 36 },
+            xaxis: { gridcolor: grid, ticksuffix: "%", zeroline: false }, yaxis: { gridcolor: "rgba(0,0,0,0)", automargin: true } }), cfg);
+  document.querySelectorAll(".salfoot").forEach(el => el.textContent =
+    `USD ranges only: ${totN.toLocaleString()} of ${inRange.length.toLocaleString()} postings in range (GBP/EUR ranges and postings without a range are excluded; ${pct(D.salary_coverage)} of all postings list a range). ` +
+    `Midpoint of the posted base range; equity is not included. Sales ranges are on-target earnings (base + commission), which lifts Sales. ` +
+    `One posting can mean several hires or none, so this shows where posted pay points, not actual spend. Quarters with fewer than 5 USD postings in a category are left blank.`);
+
+  const nRange = xs.reduce((a, i) => a + total(i), 0);
+  document.querySelectorAll(".cov").forEach(el => el.textContent =
+    `${nRange.toLocaleString()} postings, ${monthLabel(M[lo])}–${monthLabel(M[hi])}. Shaded: Dec 2025–Jan 2026, fewer archived board snapshots. Only jobs that appear in an archived snapshot are counted.`);
+
+  document.getElementById("table").innerHTML = `<table><thead><tr><th>Month</th>${C.map(c => `<th>${c}</th>`).join("")}<th>Total</th></tr></thead><tbody>` +
+    xs.map(i => `<tr><td>${monthLabel(M[i])}</td>${counts[i].map(v => `<td>${v}</td>`).join("")}<td>${total(i)}</td></tr>`).join("") + "</tbody></table>";
+  document.getElementById("method").textContent =
+    `Month = Greenhouse published_at (first archive sighting for ${D.n_first_seen_fallback} jobs without one). 2025 unique postings: ${n25.toLocaleString()} vs ${D.benchmark.hirebase_2025} in Hirebase's archive (Hirebase counts multi-location roles once per location; published_at can reset when a role is reposted). Data derived from Anthropic's public Greenhouse job board and Internet Archive snapshots; descriptions are not redistributed. Generated ${D.generated}.`;
+}
+
+fillSelects();
+document.getElementById("from").onchange = e => setRange(+e.target.value, hi);
+document.getElementById("to").onchange = e => setRange(lo, +e.target.value);
+document.querySelectorAll("[data-preset]").forEach(btn => btn.onclick = () => {
+  const p = btn.dataset.preset, last = M.length - 1;
+  if (p === "all") setRange(0, last);
+  else if (p === "12") setRange(Math.max(0, last - 11), last);
+  else { const ix = M.map((m, i) => m.startsWith(p) ? i : -1).filter(i => i >= 0); setRange(ix[0], ix[ix.length - 1]); }
+  btn.setAttribute("aria-pressed", "true");
+});
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change", render);
+setRange(0, M.length - 1);
+document.querySelector('[data-preset="all"]').setAttribute("aria-pressed", "true");
+
+// Tabs: one panel visible at a time; charts drawn while hidden are resized when shown.
+const TABS = ["clock", "mix", "engineering", "salary"];
+function showTab() {
+  const t = TABS.includes(location.hash.slice(1)) ? location.hash.slice(1) : "clock";
+  document.querySelectorAll("[data-panel]").forEach(el => el.hidden = el.dataset.panel !== t);
+  document.querySelectorAll(".tabs a[data-tab]").forEach(a => a.dataset.tab === t ? a.setAttribute("aria-current", "page") : a.removeAttribute("aria-current"));
+  document.querySelectorAll(`[data-panel="${t}"] .js-plotly-plot`).forEach(el => Plotly.Plots.resize(el));
+}
+addEventListener("hashchange", showTab);
+showTab();
+</script>
+</body>
+</html>
