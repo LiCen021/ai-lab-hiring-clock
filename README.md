@@ -4,7 +4,7 @@
 
 This project tracks how Anthropic's hiring mix changes over time, using archived snapshots of its public Greenhouse job board. The headline visual is a "doom clock" for software-engineering roles: minutes to midnight move with software engineering's share of new job postings.
 
-> The clock is a visual hook, not a causal claim. One company's hiring mix mostly reflects its growth stage, funding and strategy. A falling engineering share would not, on its own, be evidence of AI replacing engineers.
+> The clock is here to catch your eye, not to prove anything. One company's hiring mix mostly tracks its growth stage, funding and strategy. If the engineering share drops, that alone doesn't mean robots took the keyboards.
 
 **Dashboard:** `https://<username>.github.io/ai-lab-hiring-clock/` (GitHub Pages; the clock, then tabs for hiring mix, engineering, salary and a job explorer)
 
