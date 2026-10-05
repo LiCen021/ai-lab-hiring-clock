@@ -4,6 +4,7 @@ A preview of the FR8 layout before tagging exists. Category and seniority come f
 rules on the title alone (no team, no description, no LLM), so treat the numbers as rough.
 Posting month = Greenhouse `published_at`, falling back to the first archive sighting.
 
+Reads only data/processed/postings.parquet (public), so it runs in CI without raw data.
 Writes site/index.html and site/explorer.html with data embedded (opens from file://, deployable to GitHub Pages).
 Only public, structured fields are embedded: month, category and seniority per job.
 """
@@ -15,13 +16,11 @@ from collections import Counter
 
 import pandas as pd
 
-from .common import RAW, ROOT, log, settings, setup_logging
+from .common import PROCESSED, ROOT, log, settings, setup_logging
 
-ROWS_CACHE = RAW / "derived" / "sample_rows.parquet"
-SALARY_CACHE = RAW / "derived" / "sample_salary.parquet"   # job_id, salary_min/max, currency only
+POSTINGS = PROCESSED / "postings.parquet"   # public, derived data only; no raw input needed
 OUT = ROOT / "site" / "index.html"
 EXPLORER = ROOT / "site" / "explorer.html"
-HOSTS = {"job_boards": "job-boards.greenhouse.io", "boards": "boards.greenhouse.io", "api": "job-boards.greenhouse.io"}
 
 # Order = stack order = colour slot order (validated adjacent pairs). Other is neutral grey.
 CATEGORIES = ["Software engineering", "Applied / ML engineering", "Research", "Sales & GTM",
@@ -87,50 +86,27 @@ def first_match(title: str, rules: list[tuple[str, str]], default: str) -> str:
     return match_rule(title, rules, default)[0]
 
 
-def _parse_to_cache() -> None:
-    from .snapshots import load_captures, parse_all  # parse in memory; descriptions are not kept
-    _, rows, details = parse_all(load_captures())
-    ROWS_CACHE.parent.mkdir(parents=True, exist_ok=True)
-    rows.to_parquet(ROWS_CACHE, index=False)
-    sal = (details.dropna(subset=["salary_min"]).sort_values("observed_at").groupby("job_id")
-                  .agg(salary_min=("salary_min", "last"), salary_max=("salary_max", "last"),
-                       currency=("currency", "last")).reset_index())
-    sal.to_parquet(SALARY_CACHE, index=False)
+def load_postings() -> pd.DataFrame:
+    if not POSTINGS.exists():
+        raise SystemExit(f"{POSTINGS.relative_to(ROOT)} missing: run `python -m src.run_all --skip-fetch` first")
+    return pd.read_parquet(POSTINGS)
 
 
-def load_rows() -> pd.DataFrame:
-    if not ROWS_CACHE.exists():
-        _parse_to_cache()
-    return pd.read_parquet(ROWS_CACHE)
-
-
-def load_salary() -> pd.DataFrame:
-    if not SALARY_CACHE.exists():
-        _parse_to_cache()
-    return pd.read_parquet(SALARY_CACHE)
-
-
-def build_jobs(rows: pd.DataFrame) -> tuple[pd.DataFrame, list[str]]:
-    rows = rows.copy()
-    rows["pub"] = pd.to_datetime(rows["published_at"], utc=True, format="mixed", errors="coerce")
-    rows["observed_at"] = pd.to_datetime(rows["observed_at"], utc=True)
-    rows = rows[rows["title"].notna()].sort_values("observed_at")
-    jobs = rows.groupby("job_id").agg(title=("title", "last"), pub=("pub", "min"),
-                                      first_seen=("observed_at", "min"), first_source=("source", "first"),
-                                      team=("team", lambda s: s.dropna().iloc[-1] if s.notna().any() else None),
-                                      location=("location", lambda s: s.dropna().iloc[-1] if s.notna().any() else None),
-                                      last_seen=("observed_at", "max")).reset_index()
-    jobs["date_source"] = jobs["pub"].notna().map({True: "published_at", False: "first_seen"})
-    jobs["posted"] = jobs["pub"].fillna(jobs["first_seen"])
+def build_jobs(post: pd.DataFrame) -> tuple[pd.DataFrame, list[str]]:
+    jobs = post[post["title"].notna()].copy()
+    jobs["first_seen"] = pd.to_datetime(jobs["first_seen"])
+    jobs["last_seen"] = pd.to_datetime(jobs["last_seen"])
+    pub = pd.to_datetime(jobs["first_published"])
+    jobs["date_source"] = pub.notna().map({True: "published_at", False: "first_seen"})
+    jobs["posted"] = pub.fillna(jobs["first_seen"])
     jobs["month"] = jobs["posted"].dt.strftime("%Y-%m")
 
     # Months from backfill start to the last *complete* month of archive coverage.
     start = pd.Period(str(settings()["backfill_from"])[:7], "M")
-    end = pd.Period(rows["observed_at"].max().strftime("%Y-%m"), "M") - 1
+    end = pd.Period(jobs["last_seen"].max().strftime("%Y-%m"), "M") - 1
     months = [str(p) for p in pd.period_range(start, end, freq="M")]
     jobs = jobs[jobs["month"].isin(months)].copy()
 
-    jobs = jobs.merge(load_salary(), on="job_id", how="left")
     usd = jobs["currency"] == "USD"
     jobs["usd_mid"] = ((jobs["salary_min"] + jobs["salary_max"]) / 2).where(usd).round(-3)
     jobs[["category", "category_kw"]] = [match_rule(t, CATEGORY_RULES, "Other") for t in jobs["title"]]
@@ -145,11 +121,11 @@ def write_explorer(jobs: pd.DataFrame, months: list[str]) -> None:
             "team", "location", "last_seen", "archive", "salary_min", "salary_max", "currency"]
     num = lambda v: None if pd.isna(v) else int(v)
     rows = [[jid, t, m, c, ckw, s, skw, team if pd.notna(team) else "", loc if pd.notna(loc) else "", ls.strftime("%Y-%m-%d"),
-             f"https://web.archive.org/web/{fs.strftime('%Y%m%d%H%M%S')}/https://{HOSTS.get(src, HOSTS['job_boards'])}/anthropic/jobs/{jid}",
+             au if pd.notna(au) else None,
              num(lo), num(hi), cur if pd.notna(cur) else None]
-            for jid, t, m, c, ckw, s, skw, team, loc, ls, fs, src, lo, hi, cur in zip(
+            for jid, t, m, c, ckw, s, skw, team, loc, ls, au, lo, hi, cur in zip(
                 j["job_id"], j["title"], j["month"], j["category"], j["category_kw"], j["seniority"],
-                j["seniority_kw"], j["team"], j["location"], j["last_seen"], j["first_seen"], j["first_source"],
+                j["seniority_kw"], j["team"], j["location"], j["last_seen"], j["archive_url"],
                 j["salary_min"], j["salary_max"], j["currency"])]
     data = {"columns": cols, "rows": rows, "months": months, "categories": CATEGORIES, "seniority": SENIORITY,
             # Each regex split into its alternatives, so no published field is a long string.
@@ -162,7 +138,7 @@ def write_explorer(jobs: pd.DataFrame, months: list[str]) -> None:
 
 def main() -> None:
     setup_logging()
-    jobs, months = build_jobs(load_rows())
+    jobs, months = build_jobs(load_postings())
     cat_ix = {c: i for i, c in enumerate(CATEGORIES)}
     sen_ix = {s: i for i, s in enumerate(SENIORITY)}
     m_ix = {m: i for i, m in enumerate(months)}

@@ -23,9 +23,12 @@ import pandas as pd
 from .common import PROCESSED, log
 from .snapshots import DERIVED
 
+# Wayback link to a job page: the host of the source it was first seen on (API jobs live on job-boards).
+JOB_HOSTS = {"job_boards": "job-boards.greenhouse.io", "boards": "boards.greenhouse.io", "api": "job-boards.greenhouse.io"}
+
 PUBLIC_COLS = ["job_id", "title", "title_normalised", "team", "location", "url", "first_seen", "last_seen",
                "first_published", "still_open", "days_open_approx", "n_snapshots", "reappearances",
-               "sources", "seen_on", "internal_job_id", "requisition_id", "salary_min", "salary_max",
+               "sources", "seen_on", "archive_url", "internal_job_id", "requisition_id", "salary_min", "salary_max",
                "currency", "description_sha256", "tagged_from", "attributes_changed", "duplicate_of", "repost_of"]
 
 
@@ -126,6 +129,11 @@ def run(rows: pd.DataFrame | None = None, listings: pd.DataFrame | None = None,
         "sources": g["source"].agg(lambda s: ";".join(sorted(set(s)))),
         "seen_on": g["kind"].agg(lambda s: ";".join(sorted(set(s)))),
     })
+    first = rows.sort_values("observed_at").groupby("job_id")[["observed_at", "source"]].first()
+    post["archive_url"] = [None if jid.startswith("syn_") else   # no job page to link to
+                           f"https://web.archive.org/web/{t.strftime('%Y%m%d%H%M%S')}/https://"
+                           f"{JOB_HOSTS.get(src, JOB_HOSTS['job_boards'])}/anthropic/jobs/{jid}"
+                           for jid, t, src in zip(first.index, first["observed_at"], first["source"])]
     for col in ["title", "team", "location", "url", "internal_job_id", "requisition_id"]:
         post[col] = latest_non_null(rows, col)
     pub = pd.to_datetime(rows["published_at"], utc=True, errors="coerce", format="ISO8601")

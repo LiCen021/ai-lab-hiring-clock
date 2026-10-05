@@ -1,6 +1,7 @@
 """Privacy guard (REQUIREMENTS §7.7): nothing published may carry description text or PII.
 
-Fails if any file under data/processed/ or site/ that git would commit has
+Fails if any file published has (data/processed/ files git would commit, and everything under
+site/, which is built in CI and deployed whole whether or not git tracks it)
   * a data field longer than 300 characters (description text leaking through),
   * an email address, or
   * a phone-number match.
@@ -19,7 +20,6 @@ from pathlib import Path
 import pytest
 
 ROOT = Path(__file__).resolve().parent.parent
-PUBLIC_DIRS = ["data/processed", "site"]
 MAX_FIELD = 300
 
 EMAIL = re.compile(r"[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,}")
@@ -32,14 +32,15 @@ TEXT_SUFFIXES = {".csv", ".json", ".txt", ".html", ".svg", ".md"}
 
 
 def public_files() -> list[Path]:
-    """Files git would publish: tracked plus untracked-but-not-ignored."""
+    """data/processed files git would publish (tracked plus untracked-but-not-ignored), and all of site/."""
     try:
-        out = subprocess.run(["git", "ls-files", "--cached", "--others", "--exclude-standard", *PUBLIC_DIRS],
+        out = subprocess.run(["git", "ls-files", "--cached", "--others", "--exclude-standard", "data/processed"],
                              cwd=ROOT, capture_output=True, text=True, check=True).stdout
         paths = [ROOT / p for p in out.splitlines()]
     except (OSError, subprocess.CalledProcessError):
-        paths = [p for d in PUBLIC_DIRS for p in (ROOT / d).rglob("*")]
-    return sorted(p for p in paths if p.is_file())
+        paths = list((ROOT / "data/processed").rglob("*"))
+    paths += (ROOT / "site").rglob("*")   # the whole folder is deployed, git-ignored build output included
+    return sorted({p for p in paths if p.is_file()})
 
 
 def walk_strings(obj):

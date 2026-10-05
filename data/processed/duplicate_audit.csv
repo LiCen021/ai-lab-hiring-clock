@@ -1,0 +1,151 @@
+job_id,relation,of_job_id,title,location,first_seen,last_seen
+4064087008,parallel,4064086008,"Research Engineer / Research Scientist, Multimodal","London, UK",2025-01-03,2025-03-28
+4494218008,repost,4111809008,Enterprise Account Executive (API Sales),"San Francisco, CA | New York City, NY",2025-01-15,2025-03-26
+4496397008,parallel,4494273008,"Finance & Strategy, Product","San Francisco, CA",2025-01-24,2025-01-24
+4577144008,repost,4182383008,"Machine Learning Systems Engineer, RL Engineering","San Francisco, CA",2025-03-13,2025-10-14
+4581955008,repost,4494503008,"Software Engineer, Model Context Protocol","San Francisco, CA | New York City, NY | Seattle, WA",2025-03-15,2025-03-19
+4581957008,repost,4495047008,"Software Engineer, Model Context Protocol","London, UK",2025-03-15,2025-05-30
+4581888008,parallel,4581955008,"Software Engineer, Model Context Protocol","San Francisco, CA | New York City, NY | Seattle, WA",2025-03-19,2025-04-11
+4587419008,repost,4021137008,"Research Engineer, Knowledge Team","London, UK",2025-03-19,2025-08-25
+4608216008,repost,4495147008,"Staff Software Engineer, AI Reliability Engineering","London, UK",2025-03-28,2025-07-28
+4517562008,repost,4173402008,"Senior Software Engineer, Corporate Engineering","Remote-Friendly (Travel-Required) | San Francisco, CA | Seattle, WA | New York City, NY",2025-04-11,2025-04-11
+4629176008,parallel,4493035008,"Enterprise Account Executive, Industries","San Francisco, CA | New York City, NY",2025-04-26,2025-08-11
+4632120008,repost,4035346008,"Staff Software Engineer, Infrastructure","San Francisco, CA, New York City, NY, Seattle, WA",2025-04-26,2025-05-30
+4581887008,repost,4581888008,"Software Engineer, Model Context Protocol","San Francisco, CA | New York City, NY | Seattle, WA",2025-05-22,2025-05-30
+4680690008,repost,4496397008,"Finance & Strategy, Product","San Francisco, CA",2025-05-22,2025-05-30
+4756707008,repost,4457768008,Technical Revenue Accounting,"San Francisco, CA",2025-06-18,2025-07-28
+4776396008,repost,4526837008,Contracts Manager,"San Francisco, CA | New York City, NY",2025-06-25,2025-07-02
+4764057008,repost,4493763008,Facilities Coordinator,"San Francisco, CA",2025-06-28,2025-06-28
+4772968008,repost,4559983008,Global Employment Specialist,"San Francisco, CA",2025-07-02,2025-07-02
+4799651008,repost,4685853008,Corporate Counsel,"San Francisco, CA",2025-07-15,2025-07-15
+4807590008,repost,4416929008,"Product Manager, Research","San Francisco, CA | New York City, NY | Seattle, WA",2025-07-19,2025-09-30
+4803859008,repost,4518731008,"Enterprise Account Executive, Federal Civilian Sales","Washington, DC",2025-07-22,2025-09-30
+4875046008,repost,4251453008,"Research Engineer, Societal Impacts","San Francisco, CA",2025-08-08,2025-09-02
+4816199008,repost,4552905008,"Software Engineer, Claude Code","San Francisco, CA | Seattle, WA",2025-08-11,2025-12-12
+4823376008,repost,4756707008,Technical Revenue Accounting,"San Francisco, CA",2025-08-11,2025-11-15
+4856591008,repost,4665990008,"Business Development Representative, EMEA","Dublin, IE",2025-08-11,2025-08-11
+4880861008,repost,4680690008,"Finance & Strategy, Product","San Francisco, CA",2025-08-11,2025-08-11
+4887959008,repost,4407724008,Senior Software Security Engineer,"San Francisco, CA | New York City, NY | Seattle, WA",2025-08-21,2026-09-16
+4887175008,repost,4499988008,Revenue Accounting,"San Francisco, CA",2025-08-26,2025-11-15
+4890975008,repost,4884475008,GTM Strategy & Operations (Start-ups),"Dublin, IE",2025-08-26,2025-08-26
+4707330008,repost,4586918008,Head of Corporate Communications,"San Francisco, CA, New York City, NY",2025-09-12,2025-11-01
+4903531008,repost,4781700008,"Corporate Accountant, Payroll","San Francisco, CA",2025-09-17,2025-09-17
+4903965008,repost,4831483008,"Finance & Strategy Lead, APAC","Tokyo, Japan",2025-09-17,2025-09-17
+4914176008,repost,4557007008,"Product Manager, API","San Francisco, CA | New York City, NY",2025-09-17,2025-09-17
+4934273008,repost,4528598008,Order Management,"San Francisco, CA",2025-09-30,2025-12-04
+4936029008,repost,4914176008,"Product Manager, API","San Francisco, CA | New York City, NY",2025-09-30,2025-12-12
+4936119008,repost,4504815008,Senior Corporate Accountant,"San Francisco, CA",2025-09-30,2025-12-12
+4942440008,repost,4628792008,"Cloud GTM Partnerships Lead, EMEA","London, UK",2025-10-08,2025-11-15
+4959324008,repost,4773944008,"Enterprise Account Executive, DOD/IC","Washington, DC",2025-10-25,2026-02-10
+4959331008,repost,4803859008,"Enterprise Account Executive, Federal Civilian Sales","Washington, DC",2025-10-25,2026-04-14
+4961072008,repost,4666353008,"Recruiter, Applied AI","San Francisco, CA",2025-10-25,2026-02-25
+4969427008,repost,4856591008,Business Development Representative - EMEA,"Dublin, IE",2025-10-31,2026-04-14
+4970434008,repost,4780837008,"Product Designer, Enterprise","San Francisco, CA | New York City, NY | Seattle, WA",2025-10-31,2025-12-12
+4967825008,repost,4629098008,"Amazon GTM Partnership, Enterprise","San Francisco, CA | New York City, NY | Seattle, WA",2025-11-04,2025-11-15
+4978296008,parallel,4948535008,"Account Executive, Mid Market - UKI","Dublin, IE",2025-11-07,2026-03-03
+4979597008,repost,4504228008,Product Support Specialist,"Dublin, IE",2025-11-07,2026-03-03
+4980427008,repost,4020159008,"Research Scientist, Interpretability","San Francisco, CA",2025-11-08,2026-09-27
+4980430008,repost,4020305008,"Research Engineer, Interpretability","San Francisco, CA",2025-11-08,2026-09-30
+4983655008,repost,4642462008,Product Support Manager,"San Francisco, CA | New York City, NY | Seattle, WA",2025-11-14,2025-12-12
+4970411008,repost,4507306008,Startup Partnerships,"San Francisco, CA",2025-12-05,2025-12-12
+4987662008,repost,4776396008,Contracts Manager,"San Francisco, CA | New York City, NY",2025-12-05,2026-06-16
+4990162008,repost,4823376008,Technical Revenue Accounting,"San Francisco, CA",2025-12-08,2025-12-12
+5011703008,repost,4513943008,Corporate Legal Specialist,"San Francisco, CA",2025-12-11,2025-12-12
+5041174008,repost,4407096008,Recruiting Coordinator [contract],"Remote-Friendly, United States",2025-12-27,2025-12-27
+5042025008,repost,4141519008,"Software Engineer, Growth","San Francisco, CA | New York City, NY | Seattle, WA",2025-12-27,2026-03-03
+5042144008,repost,4817903008,"Strategic Partner Development, Product Partnerships","San Francisco, CA | New York City, NY",2025-12-27,2026-02-24
+5055600008,repost,4970434008,"Product Designer, Enterprise","San Francisco, CA | New York City, NY | Seattle, WA",2026-01-08,2026-01-08
+5054997008,repost,4970411008,Startup Partnerships,"San Francisco, CA",2026-01-15,2026-02-10
+5055609008,repost,4831327008,"GTM Recruiter, APAC","Tokyo, Japan",2026-01-15,2026-02-25
+5060161008,repost,4706995008,International Accounting Manager,"Dublin, IE",2026-01-20,2026-03-03
+5075086008,repost,5014431008,Compute Analyst,"San Francisco, CA | New York City, NY",2026-01-20,2026-02-10
+5077105008,repost,4900975008,"Director, Compute Infrastructure Procurement","San Francisco, CA",2026-01-20,2026-02-10
+5076616008,repost,4524032008,"Research Scientist, Societal Impacts","San Francisco, CA",2026-01-22,2026-06-10
+5081473008,repost,4830753008,"Commercial Counsel, EMEA","Dublin, IE",2026-01-31,2026-02-10
+5096573008,repost,4819432008,"Commercial Counsel, EMEA","London, UK",2026-01-31,2026-02-10
+5106251008,repost,4940809008,"External Affairs, US Federal","Washington, DC",2026-02-05,2026-02-28
+5101173008,repost,4608216008,"Staff Software Engineer, AI Reliability Engineering","London, UK",2026-02-06,2026-09-16
+5104759008,repost,5033502008,Enterprise Account Executive - Public Sector,"Tokyo, Japan",2026-02-06,2026-02-25
+5111783008,repost,4800115008,"Technical Program Manager, Infrastructure","San Francisco, CA | New York City, NY | Seattle, WA",2026-02-06,2026-09-16
+5115118008,repost,4498186008,Employment Counsel,"San Francisco, CA",2026-02-11,2026-02-25
+5115051008,repost,4880861008,"Finance & Strategy, Product","San Francisco, CA",2026-02-13,2026-02-13
+5117160008,repost,4959334008,"Enterprise Account Executive, Federal Partners Sales","Washington, DC",2026-02-13,2026-02-25
+5117581008,repost,4944846008,"Solutions Architect, Applied AI","Bangalore, India",2026-02-13,2026-06-16
+5118189008,repost,4959324008,"Enterprise Account Executive, DOD/IC","Washington, DC",2026-02-13,2026-08-09
+5120228008,repost,4970463008,"Staff+ Software Engineer, Databases","San Francisco, CA | New York City, NY",2026-02-17,2026-03-05
+5043427008,repost,4503404008,"Finance & Strategy, GTM","San Francisco, CA",2026-02-22,2026-02-24
+5121912008,repost,4988236008,"Manager, Sales Development - EMEA","Dublin, IE",2026-02-22,2026-05-19
+5135168008,parallel,4799425008,"Research Engineer / Research Scientist, Pre-training","Zürich, CH",2026-02-28,2026-08-25
+5079156008,repost,5018066008,Finance AI Engineer,"San Francisco, CA",2026-03-03,2026-03-03
+5138044008,repost,4413028008,"Technical Program Manager, Compute","San Francisco, CA | New York City, NY | Seattle, WA",2026-03-03,2026-09-16
+5142966008,repost,5096573008,"Commercial Counsel, EMEA","London, UK",2026-03-11,2026-08-25
+5142971008,repost,5081473008,"Commercial Counsel, EMEA","Dublin, IE",2026-03-11,2026-08-25
+5150472008,repost,4979237008,"Staff Software Engineer, Inference","Dublin, IE",2026-03-11,2026-09-16
+5152348008,repost,5142305008,"Senior Software Engineer, Inference","London, UK",2026-03-13,2026-08-09
+5152817008,repost,4092763008,Product Designer,"San Francisco, CA | New York City, NY | Seattle, WA",2026-03-25,2026-04-15
+5159740008,repost,4936732008,"Global Indirect, Sales Tax & VAT","San Francisco, CA",2026-04-07,2026-06-16
+5160180008,repost,5117160008,"Enterprise Account Executive, Federal Partners Sales","Washington, DC",2026-04-07,2026-08-09
+5181364008,repost,4974649008,Policy Counsel,"San Francisco, CA",2026-04-09,2026-04-09
+5182430008,repost,5105925008,Insider Risk Investigator - Technical & Human Intelligence,"San Francisco, CA | New York City, NY | Seattle, WA",2026-04-14,2026-05-19
+5186811008,repost,4983655008,Product Support Manager,"San Francisco, CA | New York City, NY | Seattle, WA",2026-04-14,2026-05-19
+5194670008,repost,4959331008,"Enterprise Account Executive, Federal Civilian Sales","Washington, DC",2026-04-21,2026-08-09
+5194835008,repost,4679137008,"Finance & Strategy, Compute","San Francisco, CA",2026-04-22,2026-05-19
+5194899008,repost,5011703008,Corporate Legal Specialist,"San Francisco, CA",2026-04-22,2026-06-21
+5203545008,repost,5114705008,"Technical Program Manager, Research","San Francisco, CA | New York City, NY",2026-05-04,2026-09-16
+5162711008,repost,4890845008,Global Senior Equity Program Manager,"San Francisco, CA | Seattle, WA",2026-05-05,2026-08-25
+5174556008,repost,5077218008,User Experience Researcher,"San Francisco, CA | New York City, NY | Seattle, WA",2026-05-06,2026-05-10
+5215052008,repost,4629118008,"Amazon GTM Partnership, Startups","San Francisco, CA | New York City, NY | Seattle, WA",2026-05-18,2026-08-09
+5222235008,repost,5062757008,Enterprise Account Executive - Industries Generalist,"Sydney, Australia",2026-05-18,2026-05-19
+5161728008,repost,5112486008,"Applied AI Architect, Partnerships","Paris, France",2026-05-19,2026-06-22
+5218552008,repost,5163925008,Enterprise Account Executive - CPG,"London, UK",2026-06-02,2026-06-02
+5239733008,repost,5010191008,"Research Scientist, Life Sciences","San Francisco, CA",2026-06-05,2026-09-07
+5237973008,repost,5163907008,"Enterprise Account Executive, Manufacturing","London, UK",2026-06-09,2026-06-21
+5221916008,parallel,5223750008,"Sales Manager, Nonprofit & Education, EMEA","London, UK",2026-06-10,2026-08-09
+5227643008,repost,5194007008,"Applied AI Architect, Public Sector","London, UK",2026-06-10,2026-06-16
+5228931008,repost,5193973008,Applied AI Architect (Startups),"Dublin, IE",2026-06-10,2026-06-16
+5221910008,repost,5161980008,"Account Executive, Beneficial Deployments (French Speaking)","London, UK",2026-06-16,2026-06-21
+5221914008,repost,5161986008,"Account Executive, Beneficial Deployments (Spanish Speaking)","London, UK",2026-06-16,2026-06-21
+5237030008,repost,4919879008,"Channel Account Manager, SI & Reseller","Tokyo, Japan",2026-06-16,2026-08-09
+5255912008,repost,4639733008,"Engineering Manager, Enterprise","San Francisco, CA",2026-06-16,2026-09-16
+5160141008,repost,5121912008,"Manager, Sales Development - EMEA","Dublin, IE",2026-06-24,2026-06-24
+5288436008,repost,5168482008,"Strategic Account Executive, CANADA Financial Services - FSI","Ontario, CAN",2026-07-02,2026-07-02
+5285557008,repost,5111745008,"Staff + Senior Software Engineer, Inference Deployment","San Francisco, CA | New York City, NY | Seattle, WA",2026-07-07,2026-09-16
+5223741008,repost,5223738008,"Enterprise Account Executive, Industries Generalist","Munich, Germany",2026-07-08,2026-07-08
+5262369008,repost,5068553008,"Customer Success Manager, Public Sector","New York City, NY; San Francisco, CA; Washington, DC",2026-07-10,2026-07-10
+5288441008,repost,5074997008,"Strategic Account Executive, Healthcare","San Francisco, CA | New York City, NY",2026-07-14,2026-07-14
+5315789008,repost,5155195008,Finance Systems Integration Engineer,"San Francisco, CA | Seattle, WA",2026-07-24,2026-07-24
+5366138008,repost,4137845008,IT Support Engineer,"San Francisco, CA",2026-07-28,2026-08-09
+5247407008,repost,5097067008,"Research Product Manager, Model Behaviors","San Francisco, CA | New York City, NY",2026-08-09,2026-08-09
+5301750008,repost,5151069008,"Staff+ Software Engineer, Databases","San Francisco, CA | New York City, NY | Seattle, WA",2026-08-09,2026-09-16
+5366149008,repost,4990657008,Business Systems Analyst,"San Francisco, CA",2026-08-09,2026-08-09
+5383114008,repost,5159146008,"Staff+ Software Engineer, Privacy","San Francisco, CA | New York City, NY | Seattle, WA",2026-08-09,2026-09-16
+5358118008,repost,5073339008,"International Indirect Tax, VAT/GST","Dublin, IE",2026-08-18,2026-08-25
+5391021008,repost,5121563008,Forward Deployed Engineer,"Paris, France",2026-08-21,2026-08-25
+5390765008,repost,5031670008,"Applied AI Architect, Industries","London, UK",2026-08-23,2026-08-25
+5287249008,repost,4677205008,Enterprise Account Executive - Life Sciences,"London, UK",2026-08-25,2026-08-25
+5358098008,repost,5194835008,"Finance & Strategy, Compute","San Francisco, CA",2026-08-25,2026-08-25
+5367585008,repost,4588716008,"Software Engineer, Desktop","San Francisco, CA | New York City, NY",2026-08-25,2026-09-16
+5375371008,repost,5187486008,Data Center Electrical Engineer,"Remote-Friendly, United States",2026-08-25,2026-09-16
+5375376008,repost,5140329008,Data Center Mechanical Engineer,"Remote-Friendly, United States",2026-08-25,2026-09-18
+5385217008,repost,5380359008,"Staff+ Researcher, Cybersecurity Products","San Francisco, CA",2026-08-25,2026-09-16
+5385764008,repost,4504694008,IT Support Engineer,"London, UK",2026-08-25,2026-08-25
+5387827008,repost,5057258008,"Applied AI Architect, Startups","San Francisco, CA | New York City, NY",2026-08-25,2026-08-25
+5387829008,repost,4678848008,"IP Counsel, Patents","San Francisco, CA",2026-08-25,2026-08-25
+5390778008,repost,4977624008,"Applied AI Architect, Industries","Munich, Germany",2026-08-25,2026-08-25
+5390787008,repost,5161728008,"Applied AI Architect, Partnerships","Paris, France",2026-08-25,2026-08-25
+5390799008,repost,5055488008,Applied AI Engineer,"Tokyo, Japan",2026-08-25,2026-08-25
+5385586008,repost,5106623008,"Solutions Marketing Lead, Public Sector","San Francisco, CA | New York City, NY",2026-08-29,2026-08-29
+5412734008,repost,5368040008,"Staff+ Software Engineer, Claude Science","San Francisco, CA",2026-09-16,2026-09-18
+5423029008,repost,5012991008,Forward Deployed Engineer,"London, UK",2026-09-16,2026-09-16
+5108111008,repost,5109135008,"Strategic Account Executive, Tech","San Francisco, CA",2026-09-23,2026-09-23
+5358108008,repost,5169670008,"Strategic Deals Lead, Compute Infrastructure","San Francisco, CA",2026-09-23,2026-09-23
+5412584008,repost,5160141008,"Manager, Sales Development - EMEA","Dublin, IE",2026-09-23,2026-09-23
+5422950008,repost,5123587008,Security Technology Deployment Specialist,"Remote-Friendly (Travel-Required) | San Francisco, CA | Seattle, WA | New York City, NY",2026-09-23,2026-09-23
+5424078008,repost,4667969008,"Product Marketing Manager, Platform","San Francisco, CA | New York City, NY",2026-09-23,2026-09-23
+5424310008,repost,5390746008,Applied AI Architect,"Mumbai, India",2026-09-23,2026-09-23
+5426933008,repost,5112493008,"Applied AI Architect, Partnerships","Munich, Germany",2026-09-23,2026-09-23
+5430422008,repost,5115678008,"External Affairs, Brussels","Brussels, Belgium",2026-09-23,2026-09-23
+5430592008,repost,4788849008,Litigation Counsel,"San Francisco, CA",2026-09-23,2026-09-23
+5432573008,repost,4968059008,"Applied AI Architect, Startups","London, UK",2026-09-23,2026-09-23
+5218573008,repost,5163917008,Enterprise Account Executive - Retail,"London, UK",2026-09-27,2026-09-27
+5391102008,repost,5063099008,Customer Success Manager,"London, UK",2026-09-27,2026-09-27

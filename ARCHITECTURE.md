@@ -5,29 +5,30 @@
 ## 1. System overview
 
 ```
-                    ┌──────────────────────────────┐
-  Wayback Machine ─▶│  Phase 1: backfill (local)   │
-  (3 board URLs)    └──────────────┬───────────────┘
-                                   │ raw snapshots
-  Greenhouse API ──▶ Phase 2: weekly GitHub Action
+  Wayback Machine ─▶ Phase 1: backfill (local, once)
+  Greenhouse API  ─▶ Phase 2: weekly Action in the PRIVATE repo
                                    │
                                    ▼
         ┌─────────────────────────────────────────────────┐
         │ parse → dedupe → scrub PII → tag → categorise    │
-        │        → metrics → build site                    │
+        │        → metrics                                 │
         └──────┬──────────────────────────────┬───────────┘
                │ raw text, raw JSON,          │ structured, derived data only
-               │ raw LLM responses            │
+               │ descriptions, LLM responses  │ (data/processed/, pushed with a PAT)
                ▼                              ▼
    ┌──────────────────────────┐   ┌───────────────────────────────┐
    │ PRIVATE repo             │   │ PUBLIC repo                   │
    │ ai-lab-hiring-raw        │   │ ai-lab-hiring-clock           │
-   │ append-only archive      │   │ code, processed data, site    │
+   │ append-only archive      │   │ code, data/processed          │
+   │ + weekly.yml             │   │ + pages.yml                   │
    └──────────────────────────┘   └───────────────┬───────────────┘
-                                                  │
+                                                  │ build site from data/processed
+                                                  │ → privacy guard → deploy
                                                   ▼
                                        GitHub Pages dashboard
 ```
+
+**Why the weekly Action runs in the private repo:** Action logs on a public repo are public, so one stray log line could leak description text. Running it privately keeps logs and raw text out of public view; only `data/processed/` crosses over. The public repo builds the site from that data alone, so anyone can reproduce the dashboard from the published data.
 
 **Join key across repos:** `job_id` (+ `description_sha256` for the exact text version, + `tagged_from` for the raw file path).
 
@@ -63,9 +64,10 @@ ai-lab-hiring-clock/
 │   │   └── schema.py          # Pydantic models generated from tags.yaml
 │   ├── categorise.py          # rules + overrides + SOC mapping
 │   ├── metrics.py             # monthly series, headline numbers, clock time
+│   ├── sample_dashboard.py    # prototype site build: data/processed → site/*.html (title-only rules)
 │   ├── build_site.py          # writes site/data/dashboard.json + static PNG/SVG
 │   └── raw_store.py           # read/write the private raw repo
-├── site/
+├── site/                      # built in CI by pages.yml from data/processed; *.html not committed
 │   ├── index.html             # static dashboard (Plotly.js), reads data/dashboard.json
 │   └── data/dashboard.json    # generated
 ├── data/
@@ -79,7 +81,7 @@ ai-lab-hiring-clock/
 │   ├── test_parsers.py        # fixtures from real snapshots (stored as minimal excerpts)
 │   └── test_metrics.py
 └── .github/workflows/
-    ├── weekly.yml             # Phase 2 collection + rebuild + deploy
+    ├── pages.yml              # build site from data/processed → privacy guard → deploy
     └── ci.yml                 # tests + privacy guard on every push/PR
 ```
 
@@ -90,9 +92,14 @@ Append-only. Files are never edited in place.
 ```
 ai-lab-hiring-raw/
 ├── wayback/<source>/<timestamp>.(html|json).gz   # one-off backfill
-├── live/<YYYY-MM-DD>.json.gz                     # weekly API, full descriptions
-└── llm_tags/<YYYY-MM-DD>.jsonl                   # raw LLM requests/responses
+├── live/<YYYY-MM-DD>.json.gz                     # weekly API, full descriptions, saved whole
+├── llm_tags/<YYYY-MM-DD>.jsonl                   # raw LLM requests/responses
+├── derived/descriptions.parquet                  # normalised description versions (see below)
+└── .github/workflows/weekly.yml                  # Phase 2 (§6.3)
 ```
+
+- **Raw files keep every capture**, even when the content repeats: each one is evidence the job was live that day (`last_seen`, close dates, open-roles counts), and keeping them lets the parser be fixed and re-run. Git stores identical file contents once, so exact repeats cost almost nothing.
+- **`descriptions.parquet`** is one table for both sources (Wayback HTML and API JSON): `job_id, observed_at, source, text, content_hash`. Text is HTML-stripped with whitespace normalised before hashing, so the same text from either source hashes the same. Rows are deduplicated on `(job_id, content_hash)`, keeping the earliest, so there is one row per distinct version of each description. Locally it is rebuilt from all raw files; the weekly Action updates it incrementally (load, append the new snapshot, dedupe, write to a temp file then rename).
 
 - Query locally with DuckDB directly over the files, e.g. `SELECT … FROM 'live/*.json.gz'`. No database file is committed (binary DB files bloat git history).
 - Expected size is well under 100 MB per year gzipped.
@@ -189,6 +196,7 @@ Computed as defined in REQUIREMENTS FR7. The clock baseline (first full quarter)
 | days_open_approx | int | ±1 week |
 | n_snapshots / reappearances | int | |
 | sources | str | which URLs it was seen in |
+| archive_url | str | Wayback link to the job page at its first sighting (null for synthetic IDs) |
 | description_sha256 | str | text version fingerprint (no text) |
 | tagged_from | str | raw file path in the private repo |
 | tag_model / prompt_version / tagged_at / tag_status | str | provenance |
@@ -207,7 +215,7 @@ Pre-aggregated series for every panel (monthly category shares, seniority mix, h
 - A single static `site/index.html` with Plotly.js from a CDN. Vanilla JS; no build step.
 - Fetches `data/dashboard.json` on load. The date-range filter recomputes shares in the browser from the posting-level array (a few thousand rows, which is instant).
 - The clock is a custom SVG dial; other panels are Plotly charts.
-- Deployed by the `actions/deploy-pages` workflow from `site/`.
+- Built and deployed by `pages.yml` (§6.2) from `data/processed/` only; the generated HTML is not committed.
 - `build_site.py` also renders PNG/SVG copies (Plotly + kaleido) into `docs/img/` for the README.
 
 **Why not Streamlit or Heroku:** Heroku's $5 Eco dynos sleep after 30 minutes idle, and Streamlit Community Cloud hibernates idle apps. Either would show a cold start or a "wake up" screen to LinkedIn visitors. The data changes weekly, so a static page is faster, free and maintenance-free.
@@ -217,32 +225,42 @@ Pre-aggregated series for every panel (monthly category shares, seniority mix, h
 ### 6.1 `ci.yml` (every push and PR)
 - Run `pytest`, including `test_privacy.py`, which fails if any file under `data/processed/` or `site/` has a field longer than 300 characters, an email match or a phone-number match.
 
-### 6.2 `weekly.yml` (Phase 2)
+### 6.2 `pages.yml` (public repo; on push to `data/processed/`, the site build code or config)
+
+```
+build:  checkout → python -m src.sample_dashboard (reads data/processed only)
+        → privacy guard on data/processed + the built site/ → upload site/
+deploy: needs build → actions/deploy-pages
+```
+
+The site build needs no raw data and no secrets.
+
+### 6.3 `weekly.yml` (Phase 2, private repo)
 
 ```
 on: schedule (weekly, e.g. Mondays) + workflow_dispatch
-permissions: contents: write, pages: write, id-token: write
 
 steps:
-  1. checkout public repo
-  2. checkout private repo (token: RAW_REPO_TOKEN) into ./raw-store
-  3. fetch_live → write raw-store/live/<date>.json.gz
+  1. checkout private repo (this repo: raw store)
+  2. checkout public repo (code; public, no token needed) into ./clock
+  3. fetch_live → write live/<date>.json.gz
   4. run pipeline (python -m src.run_all --phase live)
+       - update derived/descriptions.parquet incrementally
        - new postings only are scrubbed and tagged (OPENROUTER_API_KEY)
-       - raw LLM responses → raw-store/llm_tags/<date>.jsonl
-  5. commit + push raw-store (private)
-  6. run tests incl. privacy guard. On failure, stop before step 7.
-  7. commit + push data/processed + site/data (public)
-  8. deploy site/ to GitHub Pages
+       - raw LLM responses → llm_tags/<date>.jsonl
+  5. commit + push raw files (private)
+  6. run tests incl. privacy guard on data/processed. On failure, stop before step 7.
+  7. commit + push data/processed to the public repo (token: PUBLIC_REPO_TOKEN)
+     → triggers pages.yml there, which rebuilds and deploys the site
 ```
 
-- **Secrets:** `OPENROUTER_API_KEY`, `RAW_REPO_TOKEN` (fine-grained PAT with Contents read/write on the private repo only).
+- **Secrets (private repo):** `OPENROUTER_API_KEY`, `PUBLIC_REPO_TOKEN` (fine-grained PAT with Contents read/write on the public repo only). A PAT is required: the built-in `GITHUB_TOKEN` cannot push to another repo, and its pushes do not trigger workflows.
 - **Logging rule:** never log description text. Log counts and job IDs only.
 - **No Actions artifacts** for raw data.
 - **Partial failure:** if the LLM step fails, postings are written with `tag_status = pending` and the run continues; the next run retries pending items.
 
-### 6.3 Phase 1 backfill (local)
-`python -m src.run_all --phase backfill` on the user's machine, then push `data/raw/` contents to the private repo with `raw_store.py`, and commit processed outputs to the public repo.
+### 6.4 Phase 1 backfill (local)
+`python -m src.run_all --phase backfill` on the user's machine, then push `data/raw/` contents to the private repo with `raw_store.py`, and commit `data/processed/` to the public repo (`pages.yml` builds and deploys the site).
 
 ## 7. Configuration (`config/settings.yaml`)
 
@@ -280,4 +298,4 @@ benchmark:
 5. Full tagging, `categorise`, `metrics`
 6. `build_site` + `site/index.html` + README images
 7. `raw_store` + push of backfill raw data to the private repo
-8. `weekly.yml` + `ci.yml` (Phase 2)
+8. `weekly.yml` in the private repo (Phase 2)

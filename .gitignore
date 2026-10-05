@@ -13,3 +13,6 @@ __pycache__/
 
 # Claude Code worktrees (local checkouts, never committed)
 .claude/worktrees/
+
+# Built in CI from data/processed (pages.yml); not committed
+site/*.html

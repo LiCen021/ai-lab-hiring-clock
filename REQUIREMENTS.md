@@ -150,7 +150,7 @@ Static PNG/SVG exports of the clock and key charts are embedded in the README fo
 - **Reproducible:** one command runs the whole Phase 1 pipeline end to end; re-runs use caches and don't re-fetch or re-tag.
 - **Cheap:** $0 hosting; LLM tagging cost in cents per week.
 - **Robust:** a failed source, snapshot or LLM call degrades gracefully (logged and retried later) and doesn't abort the run.
-- **Secrets:** stored only as GitHub Actions secrets (`OPENROUTER_API_KEY`, `RAW_REPO_TOKEN`). The raw-repo token is fine-grained, with write access to the private repo only.
+- **Secrets:** stored only as GitHub Actions secrets (`OPENROUTER_API_KEY`, `PUBLIC_REPO_TOKEN`), held by the private repo, which runs the weekly Action. The token is fine-grained, with write access to the public repo only, used to push `data/processed/`.
 - **Language:** Python 3.11+.
 
 ## 7. Acceptance criteria
@@ -161,7 +161,7 @@ Static PNG/SVG exports of the clock and key charts are embedded in the README fo
 4. Under 5% of postings categorised as Other/unknown after overrides.
 5. The 2025 unique-posting count is reported next to Hirebase's 893, with an explanation of any gap. A difference within about ±15% is expected; a larger shortfall must be investigated (pagination, parser) before publishing findings.
 6. Tagger precision/recall on 50 hand-labelled postings is reported in the README.
-7. The **privacy CI test** passes: no committed file under `data/processed/` or `site/` contains a field longer than 300 characters, an email address or a phone-number match.
+7. The **privacy CI test** passes: no published file (committed under `data/processed/`, or anywhere in the built `site/`) contains a field longer than 300 characters, an email address or a phone-number match.
 8. The dashboard is live on GitHub Pages with panels 1–5 (and 6 if data is available), the coverage footnotes, the shaded low-coverage period and a working date filter.
 9. Phase 2: the weekly Action runs unattended, archives raw data to the private repo, commits updated processed data and republishes the site.
 10. The README leads with 3–5 findings, then charts, method (including the clock formula and tagger validation), and a limitations section covering: single company, snapshot granularity of about ±1 week, coverage gaps, LLM tagging error, and that hiring mix ≠ AI displacement.

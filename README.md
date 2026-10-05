@@ -35,16 +35,19 @@ Preliminary, title-only readings (Jan 2025 – Sep 2026, 2,349 postings):
 
 ## Privacy
 
-Description text is used only transiently and privately. The public repo and site contain only structured, derived data (title, team, location, dates, salary range, category, seniority). Raw snapshots stay in a git-ignored `data/raw/` and a separate private archive. A CI privacy guard (`tests/test_privacy.py`) fails if any published field is longer than 300 characters or contains an email address or phone number, and blocks the Pages deploy.
+Description text is used only transiently and privately. The public repo and site contain only structured, derived data (title, team, location, dates, salary range, category, seniority). Raw snapshots stay in a git-ignored `data/raw/` and a separate private archive. The site is built in CI from `data/processed/` alone, so it never sees raw data. A privacy guard (`tests/test_privacy.py`) runs on `data/processed/` and the built site, fails if any published field is longer than 300 characters or contains an email address or phone number, and blocks the Pages deploy.
 
 ## Running it
 
 ```bash
 python3.13 -m venv .venv && .venv/bin/pip install -r requirements.txt
-.venv/bin/python -m src.fetch_wayback        # download archive snapshots (cached; ~1 req/s)
-.venv/bin/python -m src.sample_dashboard     # build site/index.html and site/explorer.html
-.venv/bin/python -m pytest                   # tests, including the privacy guard
+.venv/bin/python -m src.fetch_wayback          # download archive snapshots (cached; ~1 req/s)
+.venv/bin/python -m src.run_all --skip-fetch   # parse + dedupe → data/processed/ (commit this)
+.venv/bin/python -m src.sample_dashboard       # local preview: data/processed/ → site/*.html
+.venv/bin/python -m pytest                     # tests, including the privacy guard
 ```
+
+Only `data/processed/` is committed. On push, `.github/workflows/pages.yml` builds `site/*.html` from it, runs the privacy guard and deploys to GitHub Pages. To rebuild the site without the raw archive, clone the repo and run `sample_dashboard` alone.
 
 ## Limitations
 
